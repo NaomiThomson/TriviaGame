@@ -26,27 +26,38 @@ var trivia = {
 
 function nextCard() {
 
-  newDiv = $('<div id="current-card">')
-
-  newDiv.append(trivia.cards[trivia.count].question);
-
-  for (var i = 0; i < trivia.cards[trivia.count].answers.length; i++) {
-    newDiv.append('<div class="radio"><label><input type="radio" name="optradio">' + trivia.cards[trivia.count].answers[i].body + '</div>');
-    checkAnswer(i);
+  if (trivia.count == trivia.cards.length) {
+    showScore();
   };
 
-  $("#trivia-question").html(newDiv);
+  $("#trivia-question").html(trivia.cards[trivia.count].question);
+
+  var answerDiv = $('<div>');
+  var answers = trivia.cards[trivia.count].answers
+
+  for (var i = 0; i < answers.length; i++) {
+    var btn = $('<button type="button">');
+    btn.addClass('answer-choice btn btn-default');
+    btn.attr('data-correct', answers[i].correct);
+    btn.text(answers[i].body);
+    $(answerDiv).append(btn);
+  };
+
+  $('#trivia-answers').html(answerDiv);
+
+  checkAnswer();
 
   trivia.count++
 
 };
 
-// !!! FIX !!! 
-function checkAnswer(index) {
-  $(".radio").click(function() {
-    console.log($(this).);
-    trivia.cards[trivia.count].answers[index].correct
-  })
+function checkAnswer() {
+  $('.answer-choice').click(function() {
+    console.log($(this).attr('data-correct'));
+    if ($(this).attr('data-correct') == 'true') {
+      trivia.score++
+    };
+  });
 };
 
 
@@ -55,19 +66,17 @@ function startTrivia() {
   trivia.showCard = setInterval(nextCard, 5000);
 };
 
-function handleAnswerClick() {
-
-}
-
 
 function showScore() {
 
-  clearInterval(trivia.showCard)
+  clearInterval(trivia.showCard);
+  $('#trivia-card').html('<h2>You got ' + trivia.score + ' out of 8 correct!</h2>');
+  if (trivia.score > 4) {
+    $('#trivia-card').append('<h2>You ARE a true Harry Potter fan!</h2>')} else {
+      $('#trivia-card').append('<h2>Sorry, you are NOT a true Harry Potter fan.</h2>')
+  }
+}; 
 
-};
 
 
 startTrivia();
-if (trivia.count == trivia.cards.length) {
-  showScore();
-};
