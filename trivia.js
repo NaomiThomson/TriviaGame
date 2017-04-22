@@ -15,23 +15,28 @@ var trivia = {
     "question":"What is Luna's Patronus?"},
     {"answers":[{"correct":false,"body":"Owls, cats, dogs"},{"correct":false,"body":"Owls, cats, small dragons "},{"correct":true,"body":"Owls, toads, cats"}],
     "question":"Which 3 pets are allowed at Hogwarts?"},
-    {"answers":[{"correct":false,"body":"Allison"},{"correct":true,"body":"Ariana"},{"correct":false,"body":"Davina"}],
-    "question":"What is Dumbledore's sister's name?"}
+    {"answers":[{"correct":false,"body":"Allison"},{"correct":true,"body":"Ariana"},{"correct":false,"body":"Davina"}],"question":"What is Dumbledore's sister's name?"}
   ],
   "count" : 0,
+  "score" : 0,
+  "timer" : 5,
   "showCard" : "",
-  "score" : 0
+  "showTime" : ""
 };
 
 
-function nextCard() {
+$('.glyphicon-play-circle').click(function() {
+  showCard();
+  showTimer();
+  startTrivia();
+});
 
-  if (trivia.count == trivia.cards.length) {
-    showScore();
-  };
+
+function showCard() {
+
+  $('.button, .play').remove();
 
   $("#trivia-question").html(trivia.cards[trivia.count].question);
-
   var answerDiv = $('<div>');
   var answers = trivia.cards[trivia.count].answers
 
@@ -44,10 +49,18 @@ function nextCard() {
   };
 
   $('#trivia-answers').html(answerDiv);
-
-  checkAnswer();
+}
+function nextCard() {
 
   trivia.count++
+
+  if (trivia.count == trivia.cards.length) {
+    showScore();
+  };
+
+  showCard();
+  checkAnswer();
+
 
 };
 
@@ -64,19 +77,53 @@ function checkAnswer() {
 function startTrivia() {
 
   trivia.showCard = setInterval(nextCard, 5000);
+  trivia.showTime = setInterval(updateTimer, 1000);
 };
 
 
 function showScore() {
 
-  clearInterval(trivia.showCard);
-  $('#trivia-card').html('<h2>You got ' + trivia.score + ' out of 8 correct!</h2>');
-  if (trivia.score > 4) {
-    $('#trivia-card').append('<h2>You ARE a true Harry Potter fan!</h2>')} else {
-      $('#trivia-card').append('<h2>Sorry, you are NOT a true Harry Potter fan.</h2>')
+  clearInterval(nextCard);
+  clearInterval(updateTimer);
+  $('#trivia-question').empty();
+  $('#trivia-answers').empty();
+
+  $('#end-game').html('<h2>You got ' + trivia.score + ' out of ' + trivia.cards.length + ' correct!</h2>');
+  if (trivia.score > ((trivia.cards.length)/2)) {
+    $('#end-game').append('<h2>You ARE a true Harry Potter fan!</h2>')} else {
+      $('#end-game').append('<h2>Sorry, but you are a wanna-be Harry Potter fan.</h2>')
+  };
+
+  var btn = $('<button>');
+  btn.addClass('start-over btn btn-default');
+  btn.text('Try again?');
+  $('#end-game').append(btn);
+
+  $('.start-over').click(function() {
+    console.log('btn works');
+    trivia.count = 0;
+    trivia.showCard = "";
+    trivia.score = 0;
+
+    $('#end-game').empty();
+    showCard();
+    startTrivia();
+  });
+
+};
+
+function showTimer() {
+  $('#timer').html(trivia.timer);
+};
+
+function updateTimer() {
+  trivia.timer--;
+  console.log(trivia.timer);
+  if (trivia.timer = 0) {
+    console.log('resetting');
+    clearInterval(updateTimer);
+    trivia.timer = 5;
+    showTimer();
   }
-}; 
-
-
-
-startTrivia();
+  showTimer();
+}
