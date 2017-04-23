@@ -1,3 +1,5 @@
+// create object that contains all trivia "cards" - including question, answers, true/false for each answer
+// initialize count, score, showCard interval function
 var trivia = {
   "cards":
   [
@@ -19,27 +21,37 @@ var trivia = {
   ],
   "count" : 0,
   "score" : 0,
-  "timer" : 5,
-  "showCard" : "",
-  "showTime" : ""
+  "showCard" : ""
 };
 
-
+// after user clicks "play" button, immediately show the 1st card
+// also start the trivia function, which will be called upon in 5 seconds
 $('.glyphicon-play-circle').click(function() {
   showCard();
-  showTimer();
   startTrivia();
 });
+
+// show next trivia card every 5 seconds
+function startTrivia() {
+
+  trivia.showCard = setInterval(nextCard, 5000);
+
+};
 
 
 function showCard() {
 
+  // delete the "play" button
   $('.button, .play').remove();
 
+  // display question
   $("#trivia-question").html(trivia.cards[trivia.count].question);
+
   var answerDiv = $('<div>');
   var answers = trivia.cards[trivia.count].answers
 
+  // for all cards, add button class to each answer and append to the answer div
+  // buttons include text of answer and data attribute "true/false" of answer
   for (var i = 0; i < answers.length; i++) {
     var btn = $('<button type="button">');
     btn.addClass('answer-choice btn btn-default');
@@ -48,8 +60,10 @@ function showCard() {
     $(answerDiv).append(btn);
   };
 
+  // update html with answer buttons
   $('#trivia-answers').html(answerDiv);
-}
+};
+
 function nextCard() {
 
   trivia.count++
@@ -61,44 +75,40 @@ function nextCard() {
   showCard();
   checkAnswer();
 
-
 };
 
 function checkAnswer() {
+  // when user clicks on their answer choice, gather "true/false" attribute
+  // if true, increase user's score by 1
   $('.answer-choice').click(function() {
-    console.log($(this).attr('data-correct'));
     if ($(this).attr('data-correct') == 'true') {
       trivia.score++
     };
   });
 };
 
-
-function startTrivia() {
-
-  trivia.showCard = setInterval(nextCard, 5000);
-  trivia.showTime = setInterval(updateTimer, 1000);
-};
-
-
 function showScore() {
 
+  //when game is over, clear interval and question/answer sections
   clearInterval(nextCard);
-  clearInterval(updateTimer);
   $('#trivia-question').empty();
   $('#trivia-answers').empty();
 
+  // display score
+  // if user gets more than half of all questions correct, they are "true harry potter fans"
   $('#end-game').html('<h2>You got ' + trivia.score + ' out of ' + trivia.cards.length + ' correct!</h2>');
   if (trivia.score > ((trivia.cards.length)/2)) {
     $('#end-game').append('<h2>You ARE a true Harry Potter fan!</h2>')} else {
       $('#end-game').append('<h2>Sorry, but you are a wanna-be Harry Potter fan.</h2>')
   };
 
+  // create button to reset game
   var btn = $('<button>');
   btn.addClass('start-over btn btn-default');
   btn.text('Try again?');
   $('#end-game').append(btn);
 
+  // reset variables and restart game
   $('.start-over').click(function() {
     console.log('btn works');
     trivia.count = 0;
@@ -111,19 +121,3 @@ function showScore() {
   });
 
 };
-
-function showTimer() {
-  $('#timer').html(trivia.timer);
-};
-
-function updateTimer() {
-  trivia.timer--;
-  console.log(trivia.timer);
-  if (trivia.timer = 0) {
-    console.log('resetting');
-    clearInterval(updateTimer);
-    trivia.timer = 5;
-    showTimer();
-  }
-  showTimer();
-}
